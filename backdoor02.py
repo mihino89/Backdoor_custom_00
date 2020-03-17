@@ -29,7 +29,6 @@ send = lambda data: conn.send(data)
 #function to receive data
 recv = lambda buffer: conn.recv(buffer)
 
-
 def recvall(buffer):
     bytData = b""
     while True:
