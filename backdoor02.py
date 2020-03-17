@@ -3,7 +3,6 @@ from queue import Queue   # like list based on FIFO alg.
 #standard module for communication between interfaces based on port
 
 intThreads = 2
-
 arrJobs = [1,2]
 queue = Queue()
 
@@ -21,6 +20,8 @@ intBuff = 1024
 decode_utf = lambda data: data.decode("utf-8")
 
 remove_quotes = lambda string: string.replace("\"", "")
+
+center = lambda string, title: f"{{:^{len(string)}}}".format(title)
 
 #function to send data
 send = lambda data: conn.send(data)
@@ -83,7 +84,53 @@ def socket_accept():
             continue
 
 
-#multithreading
+def menu_help():
+    print("\n " + " --help")
+    print("--l List all our connections")
+
+
+def close():
+    global arrConnections, arrAddresses
+
+    if (arrAddresses) == 0:
+        return
+    
+    for int_counter, conn in enumerate(arrConnections):
+        conn.send(str.encode("exit"))
+        conn.close()
+    
+    del arrConnections; arrConnections = []
+    del arrAddresses; arrAddresses = []
+
+
+def list_connections():
+    if len(arrConnections) > 0:
+        str_client = ""
+
+        for int_counter, conn in enumerate(arrConnections):
+            str_client += str(int_counter) + 4 * "  " + str(arrAddresses[int_counter][0]) + 4 * "  " + str(arrAddresses[int_counter][1]) + 4 * "  " + str(arrAddresses[int_counter][2]) + 4 * "  " + str(arrAddresses[int_counter][3]) + "\n"
+            
+        print("\n" + "ID" + 3 * "  " + center(str(arrAddresses[0][0]), "IP") + 3 * "  " + center(str(arrAddresses[0][1]), "Port") + 3 * "  " + center(str(arrAddresses[0][2]), "PC name") + 3 * "  " + center(str(arrAddresses[0][3]), "OS") + "\n" + str_client, end="")
+        
+    else:
+        print("No connections.")
+
+
+def main_menu():
+    while True:
+        str_choice = input("\n " + " >> ")
+        
+        if str_choice == "--l":
+            list_connections()
+        elif str_choice == "--x":
+            close()
+            break
+        else:
+            print("Invalid choice, try again\n")
+            menu_help()
+
+
+#multithreading - support different proccess running together
 def create_threads():
     for _ in range(intThreads):
         objThread = threading.Thread(target=work)
@@ -105,7 +152,7 @@ def work():
             while True:
                 time.sleep(0.2)
                 if len(arrAddresses) > 0:
-                    #main_menu()
+                    main_menu()
                     break
         
         queue.task_done()
