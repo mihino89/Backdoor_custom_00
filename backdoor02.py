@@ -152,6 +152,15 @@ def select_connection(connection_id, blnGetResponse):
             print("You are connected to " + arrInfo[0] + " ....\n")
 
 
+def send_commands():
+    while True:
+        str_choice = input("\nType selection: ")
+
+        if str_choice[:3] == "--m" and len(str_choice) > 3:
+            str_msg = "msg " + str_choice[4:]
+            send(str.encode(str_msg))
+
+
 def main_menu():
     while True:
         str_choice = input("\n " + " >> ")
@@ -161,7 +170,8 @@ def main_menu():
 
         elif str_choice[:3] == "--i" and len(str_choice) > 3:
             conn = select_connection(str_choice[4:], "True")
-            
+            if conn is not None:
+                send_commands()
         elif str_choice == "--x":
             close()
             break

