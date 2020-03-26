@@ -10,7 +10,7 @@ arrAddresses = []
 arrConnections = []
 
 # TODO refaktor on ipnut
-strHost = "192.168.0.98"
+strHost = "192.168.0.129"
 intPort = 4444
 
 #maximum characters which i can receive

